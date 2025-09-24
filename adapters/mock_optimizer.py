@@ -51,3 +51,7 @@ class MockOptimizerAdapter(BaseAdapter):
         await asyncio.sleep(0.5)
         
         return self.translate_response(optimized_code, umf_request)
+    
+    async def health_check(self) -> bool:
+        """Mock optimizer is always healthy"""
+        return True

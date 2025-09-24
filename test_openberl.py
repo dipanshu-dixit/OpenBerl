@@ -54,6 +54,10 @@ class MockGPTAdapter(BaseAdapter):
             result = "Mock response for: " + str(umf_request.payload)
         
         return self.translate_response(result, umf_request)
+    
+    async def health_check(self) -> bool:
+        """Mock adapter is always healthy for testing"""
+        return True
 
 async def test_happy_path():
     """Test 1: Happy Path - Core functionality works"""

@@ -73,9 +73,10 @@ class BaseAdapter(ABC):
         """Execute the request and return UMF response"""
         pass
     
+    @abstractmethod
     async def health_check(self) -> bool:
-        """Check if adapter is healthy"""
-        return True
+        """Check if adapter is healthy - must be implemented by subclasses"""
+        pass
 
 class ExecutionMode(Enum):
     SEQUENTIAL = "sequential"
