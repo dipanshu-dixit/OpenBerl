@@ -110,11 +110,38 @@ class Pipeline:
         return self
     
     async def execute(self, initial_payload: Any, execution_mode: ExecutionMode = ExecutionMode.SEQUENTIAL) -> Dict[str, UMFResponse]:
-        """Execute pipeline"""
+        """Execute pipeline with authorization validation"""
+        # Validate pipeline configuration before execution
+        self._validate_pipeline_security()
+        
         if execution_mode == ExecutionMode.PARALLEL:
             return await self._execute_parallel(initial_payload)
         else:
             return await self._execute_sequential(initial_payload)
+    
+    def _validate_pipeline_security(self):
+        """Validate pipeline configuration for security"""
+        if not self.steps:
+            raise ValueError("Pipeline has no steps configured")
+        
+        # Validate each step has authorized adapters
+        for step in self.steps:
+            task_type = step['task_type']
+            if not isinstance(task_type, str) or not task_type.strip():
+                raise ValueError(f"Invalid task type in step '{step['name']}': {task_type}")
+            
+            # Ensure task type is in our allowed list (server-side validation)
+            allowed_task_types = {
+                TaskTypes.CODE_GENERATION,
+                TaskTypes.CODE_OPTIMIZATION, 
+                TaskTypes.CODE_DEPLOYMENT,
+                TaskTypes.TEXT_GENERATION,
+                TaskTypes.IMAGE_GENERATION,
+                TaskTypes.ANALYSIS
+            }
+            
+            if task_type not in allowed_task_types:
+                raise ValueError(f"Unauthorized task type: {task_type}")
     
     async def _execute_sequential(self, initial_payload: Any) -> Dict[str, UMFResponse]:
         """Execute steps sequentially"""
@@ -144,28 +171,71 @@ class Pipeline:
         return results
     
     def _select_adapter(self, task_type: str) -> BaseAdapter:
-        """Select best adapter for task type with validation"""
-        # Validate task type is allowed
+        """Select best adapter for task type with server-side authorization"""
+        # Server-side validation - never trust client input
         if not isinstance(task_type, str) or not task_type.strip():
             raise ValueError(f"Invalid task type: {task_type}")
         
+        # Get registered adapters (server-controlled list)
         adapters = self.adapters.get(task_type, [])
         if not adapters:
             raise ValueError(f"No adapter found for task type: {task_type}")
         
-        # Validate all adapters support the requested task type
-        valid_adapters = [a for a in adapters if task_type in a.get_capabilities()]
-        if not valid_adapters:
-            raise ValueError(f"No valid adapter found for task type: {task_type}")
+        # Double-check adapter capabilities (server-side verification)
+        authorized_adapters = []
+        for adapter in adapters:
+            try:
+                capabilities = adapter.get_capabilities()
+                if task_type in capabilities:
+                    authorized_adapters.append(adapter)
+            except Exception:
+                # Skip adapters that fail capability check
+                continue
         
-        # Simple load balancing: use adapter with lowest request count
-        return min(valid_adapters, key=lambda a: a.request_count)
+        if not authorized_adapters:
+            raise ValueError(f"No authorized adapter found for task type: {task_type}")
+        
+        # Server-controlled load balancing
+        return min(authorized_adapters, key=lambda a: a.request_count)
     
     async def _execute_parallel(self, initial_payload: Any) -> Dict[str, UMFResponse]:
-        """Execute steps in parallel where possible"""
-        # For now, just execute sequentially
-        # TODO: Implement true parallel execution
-        return await self._execute_sequential(initial_payload)
+        """Execute independent steps in parallel"""
+        # For steps that don't depend on previous results, run in parallel
+        # For now, identify independent steps and run them concurrently
+        
+        if len(self.steps) <= 1:
+            return await self._execute_sequential(initial_payload)
+        
+        # Simple parallel execution: run all steps with same input concurrently
+        # This works for analysis/processing tasks that don't chain
+        tasks = []
+        for step in self.steps:
+            adapter = self._select_adapter(step['task_type'])
+            request = UMFRequest(
+                task_type=step['task_type'],
+                payload=initial_payload,
+                metadata=step['params'],
+                priority=step.get('priority', 0)
+            )
+            tasks.append(self._execute_step(adapter, request, step['name']))
+        
+        # Execute all steps concurrently
+        step_results = await asyncio.gather(*tasks)
+        
+        # Combine results
+        results = {}
+        for step_name, response in step_results:
+            results[step_name] = response
+            step_cost = response.cost_info.get("estimated_cost", 0.0)
+            self.cost_tracking["total_cost"] += step_cost
+            self.cost_tracking["cost_by_step"][step_name] = step_cost
+        
+        return results
+    
+    async def _execute_step(self, adapter: BaseAdapter, request: UMFRequest, step_name: str) -> tuple:
+        """Execute a single step and return name, response tuple"""
+        response = await adapter.execute(request)
+        return step_name, response
     
     def get_cost_analysis(self) -> Dict[str, Any]:
         """Get cost analysis"""

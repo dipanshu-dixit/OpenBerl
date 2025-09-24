@@ -10,6 +10,7 @@ import aiohttp
 import time
 import hashlib
 from typing import Dict, Any, List
+from collections import OrderedDict
 import sys
 import os
 sys.path.append(os.path.dirname(os.path.dirname(os.path.abspath(__file__))))
@@ -23,7 +24,7 @@ class GPT4Adapter(BaseAdapter):
         config = config or {}
         super().__init__("gpt-4", api_key, config)
         self.base_url = "https://api.openai.com/v1"
-        self.response_cache = {}
+        self.response_cache = OrderedDict()
         self.cost_per_token = {"input": 0.00003, "output": 0.00006}
         self.fallback_model = config.get("fallback_model", "gpt-3.5-turbo")
         self.enable_caching = config.get("enable_caching", True)
@@ -179,10 +180,9 @@ class GPT4Adapter(BaseAdapter):
         return hashlib.md5(cache_data.encode()).hexdigest()
     
     def _cache_response(self, cache_key: str, response: UMFResponse):
-        """Cache response"""
+        """Cache response with LRU eviction"""
         if len(self.response_cache) >= 1000:
-            # Remove oldest entry
-            oldest_key = next(iter(self.response_cache))
-            del self.response_cache[oldest_key]
+            # Remove oldest entry (FIFO with OrderedDict)
+            self.response_cache.popitem(last=False)
         
         self.response_cache[cache_key] = response

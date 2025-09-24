@@ -114,7 +114,7 @@ async def test_security_fixes():
         await pipeline.execute("test")
         print("❌ FAIL: Authorization bypass not prevented")
     except ValueError as e:
-        if "No adapter found" in str(e):
+        if "Unauthorized task type" in str(e) or "No adapter found" in str(e):
             print("✅ PASS: Authorization bypass prevented")
             passed += 1
         else:

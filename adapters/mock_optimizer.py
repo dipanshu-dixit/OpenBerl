@@ -48,7 +48,7 @@ class MockOptimizerAdapter(BaseAdapter):
 # - Optimized loops"""
         
         # Simulate processing time
-        await asyncio.sleep(0.5)
+        await asyncio.sleep(0.1)
         
         return self.translate_response(optimized_code, umf_request)
     
