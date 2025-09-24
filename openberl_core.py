@@ -49,7 +49,7 @@ class BaseAdapter(ABC):
         
         # Secure credential handling
         if api_key and api_key not in ["demo-key", "test-key"]:
-            if not isinstance(api_key, str) or len(api_key.strip()) < 10:
+            if not isinstance(api_key, str) or len(api_key.strip()) == 0 or len(api_key.strip()) < 10:
                 raise ValueError(f"Invalid API key format for {model_name}")
         self.api_key = api_key
     
@@ -98,7 +98,9 @@ class Pipeline:
         for capability in capabilities:
             if capability not in self.adapters:
                 self.adapters[capability] = []
-            self.adapters[capability].append(adapter)
+            # Prevent duplicate registration
+            if adapter not in self.adapters[capability]:
+                self.adapters[capability].append(adapter)
     
     def add_step(self, name: str, task_type: str, **kwargs):
         """Add a step to the pipeline"""
@@ -234,8 +236,19 @@ class Pipeline:
     
     async def _execute_step(self, adapter: BaseAdapter, request: UMFRequest, step_name: str) -> tuple:
         """Execute a single step and return name, response tuple"""
-        response = await adapter.execute(request)
-        return step_name, response
+        try:
+            response = await adapter.execute(request)
+            return step_name, response
+        except Exception as e:
+            # Create error response for failed step
+            from openberl_core import UMFResponse
+            error_response = UMFResponse(
+                task_type=request.task_type,
+                result=f"Error in step '{step_name}': {str(e)}",
+                request_id=request.request_id,
+                metadata={"error": True, "error_message": str(e)}
+            )
+            return step_name, error_response
     
     def get_cost_analysis(self) -> Dict[str, Any]:
         """Get cost analysis"""

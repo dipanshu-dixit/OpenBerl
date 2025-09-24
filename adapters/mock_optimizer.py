@@ -36,7 +36,8 @@ class MockOptimizerAdapter(BaseAdapter):
     async def execute(self, umf_request: UMFRequest) -> UMFResponse:
         """Simulate code optimization"""
         
-        code = str(umf_request.payload)
+        # Sanitize input to prevent XSS
+        code = str(umf_request.payload).replace('<', '&lt;').replace('>', '&gt;').replace('&', '&amp;')
         
         # Simple mock optimization: add performance comments
         optimized_code = f"""# Optimized version

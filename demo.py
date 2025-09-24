@@ -7,6 +7,7 @@ Copyright (c) 2024 OpenBerl Foundation.
 
 import asyncio
 import os
+import time
 from datetime import datetime
 from openberl_core import Pipeline, TaskTypes
 from adapters.gpt4_adapter import GPT4Adapter
@@ -50,12 +51,12 @@ async def main():
         print(f"\n📋 Request {i}: {request}")
         
         try:
-            start_time = asyncio.get_event_loop().time()
+            start_time = time.perf_counter()
             
             # Execute through universal protocol
             results = await pipeline.execute(request)
             
-            execution_time = asyncio.get_event_loop().time() - start_time
+            execution_time = time.perf_counter() - start_time
             
             print(f"✅ Completed in {execution_time:.2f}s")
             
@@ -76,8 +77,11 @@ async def main():
                 print("💡 Set OPENAI_API_KEY environment variable for full demo")
     
     # Show cost analysis
-    cost_analysis = pipeline.get_cost_analysis()
-    print(f"\n💰 Total Cost: ${cost_analysis['total_cost']:.6f}")
+    try:
+        cost_analysis = pipeline.get_cost_analysis()
+        print(f"\n💰 Total Cost: ${cost_analysis['total_cost']:.6f}")
+    except Exception as e:
+        print(f"\n💰 Cost analysis unavailable: {e}")
     
     print("\n" + "=" * 50)
     print("🎯 OpenBerl Benefits Demonstrated:")
