@@ -15,7 +15,7 @@ class MockOptimizerAdapter(BaseAdapter):
     """Mock adapter that simulates code optimization"""
     
     def __init__(self):
-        super().__init__("mock-optimizer", None)
+        super().__init__("mock-optimizer", "demo-key")
     
     def get_capabilities(self) -> List[str]:
         return [TaskTypes.CODE_OPTIMIZATION]
@@ -27,8 +27,10 @@ class MockOptimizerAdapter(BaseAdapter):
         return UMFResponse(
             task_type=original_request.task_type,
             result=model_response,
+            request_id=original_request.request_id,
             metadata={"optimizations_applied": ["removed_unused_imports", "improved_performance"]},
-            model_info={"provider": "mock", "model": self.model_name}
+            model_info={"provider": "mock", "model": self.model_name},
+            cost_info={"estimated_cost": 0.0}
         )
     
     async def execute(self, umf_request: UMFRequest) -> UMFResponse:

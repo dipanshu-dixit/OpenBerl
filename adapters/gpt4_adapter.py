@@ -48,9 +48,12 @@ class GPT4Adapter(BaseAdapter):
             {"role": "system", "content": system_prompts.get(umf_request.task_type, "You are a helpful AI assistant.")}
         ]
         
-        # Add context
+        # Add context with validation
         for ctx in umf_request.context:
-            messages.append(ctx)
+            if isinstance(ctx, dict) and "role" in ctx and "content" in ctx:
+                messages.append(ctx)
+            else:
+                raise ValueError(f"Invalid context format: {ctx}")
         
         # Add user request
         messages.append({"role": "user", "content": str(umf_request.payload)})
@@ -108,6 +111,10 @@ class GPT4Adapter(BaseAdapter):
     
     async def execute(self, umf_request: UMFRequest) -> UMFResponse:
         """Execute request with caching and retries"""
+        
+        # Validate API key before execution
+        if not self.api_key or self.api_key == "demo-key":
+            raise ValueError("Valid OpenAI API key required. Set OPENAI_API_KEY environment variable.")
         
         # Check cache
         if self.enable_caching:

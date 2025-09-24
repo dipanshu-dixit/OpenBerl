@@ -31,7 +31,7 @@ class UMFResponse:
     """Universal Message Format for AI model responses"""
     task_type: str
     result: Any
-    request_id: str
+    request_id: str = ""
     response_id: str = field(default_factory=lambda: str(uuid.uuid4()))
     timestamp: float = field(default_factory=time.time)
     execution_time: float = 0.0
@@ -44,9 +44,14 @@ class BaseAdapter(ABC):
     
     def __init__(self, model_name: str, api_key: str = None, config: Dict[str, Any] = None):
         self.model_name = model_name
-        self.api_key = api_key
         self.config = config or {}
         self.request_count = 0
+        
+        # Secure credential handling
+        if api_key and api_key != "demo-key":
+            if not isinstance(api_key, str) or len(api_key.strip()) < 10:
+                raise ValueError(f"Invalid API key format for {model_name}")
+        self.api_key = api_key
     
     @abstractmethod
     def get_capabilities(self) -> List[str]:
@@ -138,13 +143,22 @@ class Pipeline:
         return results
     
     def _select_adapter(self, task_type: str) -> BaseAdapter:
-        """Select best adapter for task type"""
+        """Select best adapter for task type with validation"""
+        # Validate task type is allowed
+        if not isinstance(task_type, str) or not task_type.strip():
+            raise ValueError(f"Invalid task type: {task_type}")
+        
         adapters = self.adapters.get(task_type, [])
         if not adapters:
             raise ValueError(f"No adapter found for task type: {task_type}")
         
+        # Validate all adapters support the requested task type
+        valid_adapters = [a for a in adapters if task_type in a.get_capabilities()]
+        if not valid_adapters:
+            raise ValueError(f"No valid adapter found for task type: {task_type}")
+        
         # Simple load balancing: use adapter with lowest request count
-        return min(adapters, key=lambda a: a.request_count)
+        return min(valid_adapters, key=lambda a: a.request_count)
     
     async def _execute_parallel(self, initial_payload: Any) -> Dict[str, UMFResponse]:
         """Execute steps in parallel where possible"""

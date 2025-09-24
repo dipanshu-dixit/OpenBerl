@@ -66,6 +66,12 @@ class YourModelAdapter(BaseAdapter):
 
 ## Questions?
 
+**Need help?**
+- 🐛 **Found a bug?** Use our [bug report template](/.github/ISSUE_TEMPLATE/bug_report.md)
+- ❓ **Have a question?** Use our [support template](/.github/ISSUE_TEMPLATE/support_question.md)
+- 🔧 **Integration help?** Use our [integration template](/.github/ISSUE_TEMPLATE/integration_help.md)
+- 📚 **Common issues?** Check our [troubleshooting guide](TROUBLESHOOTING.md)
+
 Open an issue or start a discussion. The community is here to help.
 
 ---

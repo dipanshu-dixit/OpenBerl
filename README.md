@@ -178,6 +178,8 @@ print(result)  # Comprehensive analysis from the best available model
 - Community support
 - No credit card required
 
+**Need Help?** Check our [Troubleshooting Guide](TROUBLESHOOTING.md) for common issues and solutions.
+
 ## The Vision
 
 **AI models should work together seamlessly**
