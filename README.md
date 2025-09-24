@@ -224,12 +224,19 @@ Just as HTTP connected the world's computers, OpenBerl connects the world's AI m
 
 ## Contributing
 
+**Join the movement to build the universal AI protocol:**
+
 1. **Fork the repository**
 2. **Build an adapter** for your favorite AI model
 3. **Submit a pull request**
-4. **Help shape the universal standard**
+4. **Get recognized** as a founding contributor
 
-Check out our [Contributing Guide](CONTRIBUTING.md) for detailed instructions.
+**Resources:**
+- [Contributing Guide](CONTRIBUTING.md) - How to get started
+- [Roadmap](ROADMAP.md) - What we're building together
+- [Community](COMMUNITY.md) - Connect with other contributors
+
+**First-time contributor?** Look for issues labeled `good first issue`
 
 ## Pricing
 
@@ -256,8 +263,20 @@ Check out our [Contributing Guide](CONTRIBUTING.md) for detailed instructions.
 **Open Source Forever**
 The core protocol is MIT licensed. Build on it, extend it, make it yours.
 
+## Contributors
+
+**Founding Contributors:**
+*Be the first to build an adapter and get your name here*
+
+**Community:**
+- 🌟 GitHub Stars: Growing daily
+- 🔧 Active Contributors: Join us!
+- 🤝 Adapters Built: Help us reach 10
+
 ---
 
 *"The best infrastructure is invisible. It just works."*
 
 **© 2025 OpenBerl Foundation. Building the future of AI, together.**
+
+**Connect:** [GitHub Discussions](https://github.com/OPENBERL/Project-OpenBerl/discussions) | [Community](COMMUNITY.md) | [Roadmap](ROADMAP.md)
