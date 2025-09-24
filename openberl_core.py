@@ -48,7 +48,7 @@ class BaseAdapter(ABC):
         self.request_count = 0
         
         # Secure credential handling
-        if api_key and api_key != "demo-key":
+        if api_key and api_key not in ["demo-key", "test-key"]:
             if not isinstance(api_key, str) or len(api_key.strip()) < 10:
                 raise ValueError(f"Invalid API key format for {model_name}")
         self.api_key = api_key
