@@ -28,9 +28,6 @@ Welcome to the OpenBerl community. We're developers, researchers, and companies 
 - Specific feature requests
 - Documentation improvements
 
-**Social Media:**
-- Follow [@OpenBerl](https://twitter.com/openberl) for updates
-- Share your projects with #OpenBerl
 
 ## 🎯 Ways to Contribute
 
@@ -113,14 +110,10 @@ Welcome to the OpenBerl community. We're developers, researchers, and companies 
 
 ## 📞 Contact
 
-**Project Leadership:**
-- Maintainer: [Your GitHub handle]
-- Email: community@openberl.org
 
 **Quick Response Channels:**
 - GitHub Issues (technical)
 - GitHub Discussions (general)
-- Twitter DMs (urgent)
 
 ---
 

@@ -2,7 +2,7 @@
 OpenBerl - Universal AI Protocol Demo
 See the future of AI model interoperability
 
-Copyright (c) 2024 OpenBerl Foundation.
+Copyright (c) 2025 OpenBerl Foundation.
 """
 
 import asyncio

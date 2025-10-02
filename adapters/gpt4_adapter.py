@@ -2,7 +2,7 @@
 GPT-4 Adapter for OpenBerl
 Production-ready implementation
 
-Copyright (c) 2024 OpenBerl Foundation.
+Copyright (c) 2025 OpenBerl Foundation.
 """
 
 import asyncio

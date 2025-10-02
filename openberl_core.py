@@ -2,7 +2,7 @@
 OpenBerl - Universal AI Protocol
 The missing layer that connects all AI models
 
-Copyright (c) 2024 OpenBerl Foundation.
+Copyright (c) 2025 OpenBerl Foundation.
 """
 
 from abc import ABC, abstractmethod
