@@ -3,7 +3,7 @@
 
 **The missing layer that makes AI models work together seamlessly**
 
-🌐 **UNIVERSAL** | 🔒 **PATENT PENDING** | ⚡ **PRODUCTION READY**
+🌐 **UNIVERSAL** 
 
 OpenBerl solves the fundamental problem every developer faces: AI models don't talk to each other. What should take minutes currently takes months of custom integration work. We've built the universal translation layer that every AI application needs.
 
@@ -170,10 +170,8 @@ result = await pipeline.execute("What are the key trends in AI?")
 print(result)  # Comprehensive analysis from the best available model
 ```
 
-**Live Demo:** [Try OpenBerl in your browser](https://demo.openberl.org)
-
 **Free Tier:** 
-- 10,000 requests/month
+- Unlimited requests/month
 - All core features
 - Community support
 - No credit card required
@@ -271,7 +269,7 @@ The core protocol is MIT licensed. Build on it, extend it, make it yours.
 *Be the first to build an adapter and get your name here*
 
 **Community:**
-- 🌟 GitHub Stars: Growing daily
+- 🌟 GitHub Stars: 1
 - 🔧 Active Contributors: Join us!
 - 🤝 Adapters Built: Help us reach 10
 
