@@ -1,11 +1,11 @@
 # OpenBerl Roadmap
-## Building the Universal AI Protocol Together
+## Building the Universal AI Adapter Framework Together
 
 This is our shared vision for making AI models work together seamlessly. Every contribution moves us closer to this future.
 
 ## 🎯 Current Focus: Foundation (v0.1)
 
-**Goal:** Prove the universal protocol works
+**Goal:** Prove the universal adapter framework works
 
 **What we need:**
 - [ ] **Core Adapters** - GPT-4 ✅, Claude, Gemini, Llama
@@ -83,4 +83,4 @@ This is our shared vision for making AI models work together seamlessly. Every c
 
 **This roadmap evolves with the community. Your contributions shape our direction.**
 
-*Want to influence the future of AI interoperability? Start contributing today.*
+*Want to influence the future of AI adapter interoperability? Start contributing today.*

@@ -1,6 +1,6 @@
 """
-OpenBerl - Universal AI Protocol Demo
-See the future of AI model interoperability
+OpenBerl - AI Adapter Framework Demo
+See how AI adapters work together seamlessly
 
 Copyright (c) 2025 OpenBerl Foundation.
 """
@@ -14,9 +14,9 @@ from adapters.gpt4_adapter import GPT4Adapter
 from adapters.mock_optimizer import MockOptimizerAdapter
 
 async def main():
-    """Demonstrate OpenBerl's universal AI protocol"""
+    """Demonstrate OpenBerl's AI adapter framework"""
     
-    print("🌐 OpenBerl - Universal AI Protocol")
+    print("🌐 OpenBerl - AI Adapter Framework")
     print("=" * 50)
     print(f"Started: {datetime.now().strftime('%H:%M:%S')}")
     print("=" * 50)
@@ -44,7 +44,7 @@ async def main():
         "Write a REST API endpoint for user authentication"
     ]
     
-    print("🚀 Processing requests through universal protocol...")
+    print("🚀 Processing requests through adapter framework...")
     print("-" * 50)
     
     for i, request in enumerate(requests, 1):
@@ -53,7 +53,7 @@ async def main():
         try:
             start_time = time.perf_counter()
             
-            # Execute through universal protocol
+            # Execute through adapter pipeline
             results = await pipeline.execute(request)
             
             execution_time = time.perf_counter() - start_time
@@ -85,11 +85,11 @@ async def main():
     
     print("\n" + "=" * 50)
     print("🎯 OpenBerl Benefits Demonstrated:")
-    print("  ✓ Universal protocol works with any AI model")
+    print("  ✓ Adapter framework works with any AI model")
     print("  ✓ Automatic cost optimization and caching")
     print("  ✓ Seamless model chaining and orchestration")
     print("  ✓ Production-ready with error handling")
-    print("  ✓ Vendor-agnostic - switch models without code changes")
+    print("  ✓ Adapter-based - switch models without code changes")
     
     print(f"\n🌐 Learn more: https://github.com/OPENBERL/Project-OpenBerl")
 

@@ -11,10 +11,10 @@ import os
 # Add current directory to path
 sys.path.insert(0, os.path.dirname(os.path.abspath(__file__)))
 
-from openberl_core import Pipeline, TaskTypes, UMFRequest, BaseAdapter
+from openberl_core import Pipeline, TaskTypes, UMFRequest, AdapterRuntime
 from adapters.mock_optimizer import MockOptimizerAdapter
 
-class MockGPTAdapter(BaseAdapter):
+class MockGPTAdapter(AdapterRuntime):
     """Mock GPT adapter for testing without API dependencies"""
     
     def __init__(self, api_key: str = "test-key"):
@@ -35,12 +35,10 @@ class MockGPTAdapter(BaseAdapter):
             cost_info={"estimated_cost": 0.001}
         )
     
-    async def execute(self, umf_request):
+    async def _execute_request(self, umf_request):
         # Validate context like real GPT adapter
         for ctx in umf_request.context:
-            if isinstance(ctx, dict) and "role" in ctx and "content" in ctx:
-                continue
-            else:
+            if not (isinstance(ctx, dict) and "role" in ctx and "content" in ctx):
                 raise ValueError(f"Invalid context format: {ctx}")
         
         # Simulate code generation
@@ -138,10 +136,7 @@ async def test_security_fixes():
     
     # Test 2c: Context validation
     try:
-        pipeline = Pipeline()
         gpt_adapter = MockGPTAdapter("test-key")
-        pipeline.register_adapter(gpt_adapter)
-        pipeline.add_step("test", TaskTypes.TEXT_GENERATION)
         
         # Create request with invalid context
         request = UMFRequest(
@@ -150,14 +145,14 @@ async def test_security_fixes():
             context=[{"invalid": "context"}]  # Missing role/content
         )
         
-        await gpt_adapter.execute(request)
-        print("❌ FAIL: Invalid context not caught")
-    except ValueError as e:
-        if "Invalid context format" in str(e):
+        response = await gpt_adapter.execute(request)
+        
+        # Check if error was wrapped in response
+        if "Error:" in response.result and "Invalid context format" in response.result:
             print("✅ PASS: Invalid context rejected")
             passed += 1
         else:
-            print(f"❌ FAIL: Wrong error message: {e}")
+            print(f"❌ FAIL: Context validation not working: {response.result}")
     except Exception as e:
         print(f"❌ FAIL: Unexpected error: {e}")
     

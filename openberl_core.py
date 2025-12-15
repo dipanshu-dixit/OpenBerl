@@ -1,5 +1,5 @@
 """
-OpenBerl - Universal AI Protocol
+OpenBerl - Universal AI Adapter Framework
 The missing layer that connects all AI models
 
 Copyright (c) 2025 OpenBerl Foundation.
@@ -15,43 +15,36 @@ from enum import Enum
 
 @dataclass
 class UMFRequest:
-    """Universal Message Format for AI model requests"""
-    task_type: str
-    payload: Any
-    request_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    timestamp: float = field(default_factory=time.time)
-    context: List[Dict[str, Any]] = field(default_factory=list)
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    routing: Dict[str, Any] = field(default_factory=dict)
-    priority: int = 0
-    timeout: float = 300.0
+    """Standard request format for AI adapters - v0 minimal"""
+    task_type: str  # Required: adapter selection and routing
+    payload: Any    # Required: the actual request content
+    request_id: str = field(default_factory=lambda: str(uuid.uuid4()))  # Required: response linking
+    context: List[Dict[str, Any]] = field(default_factory=list)  # Required: GPT4Adapter validation
+    metadata: Dict[str, Any] = field(default_factory=dict)  # Required: adapter parameters (max_tokens, temperature)
+    
+    # TODO v1: Add back for advanced features
+    # timestamp: float = field(default_factory=time.time)
+    # routing: Dict[str, Any] = field(default_factory=dict)
+    # priority: int = 0
+    # timeout: float = 300.0
 
 @dataclass
 class UMFResponse:
-    """Universal Message Format for AI model responses"""
-    task_type: str
-    result: Any
-    request_id: str = ""
-    response_id: str = field(default_factory=lambda: str(uuid.uuid4()))
-    timestamp: float = field(default_factory=time.time)
-    execution_time: float = 0.0
-    metadata: Dict[str, Any] = field(default_factory=dict)
-    model_info: Dict[str, Any] = field(default_factory=dict)
-    cost_info: Dict[str, Any] = field(default_factory=dict)
-
-class BaseAdapter(ABC):
-    """Base adapter interface for AI models"""
+    """Standard response format from AI adapters - v0 minimal"""
+    task_type: str  # Required: pipeline step identification
+    result: Any     # Required: the actual response content
+    request_id: str = ""  # Required: links response to request
+    cost_info: Dict[str, Any] = field(default_factory=dict)  # Required: pipeline cost tracking
     
-    def __init__(self, model_name: str, api_key: str = None, config: Dict[str, Any] = None):
-        self.model_name = model_name
-        self.config = config or {}
-        self.request_count = 0
-        
-        # Secure credential handling
-        if api_key and api_key not in ["demo-key", "test-key"]:
-            if not isinstance(api_key, str) or len(api_key.strip()) == 0 or len(api_key.strip()) < 10:
-                raise ValueError(f"Invalid API key format for {model_name}")
-        self.api_key = api_key
+    # TODO v1: Add back for monitoring and debugging
+    # response_id: str = field(default_factory=lambda: str(uuid.uuid4()))
+    # timestamp: float = field(default_factory=time.time)
+    # execution_time: float = 0.0
+    # metadata: Dict[str, Any] = field(default_factory=dict)
+    # model_info: Dict[str, Any] = field(default_factory=dict)
+
+class AdapterInterface(ABC):
+    """Pure interface for AI model adapters"""
     
     @abstractmethod
     def get_capabilities(self) -> List[str]:
@@ -69,21 +62,58 @@ class BaseAdapter(ABC):
         pass
     
     @abstractmethod
-    async def execute(self, umf_request: UMFRequest) -> UMFResponse:
-        """Execute the request and return UMF response"""
+    async def _execute_request(self, umf_request: UMFRequest) -> UMFResponse:
+        """Execute the actual model request - implement model-specific logic"""
         pass
     
     @abstractmethod
     async def health_check(self) -> bool:
-        """Check if adapter is healthy - must be implemented by subclasses"""
+        """Check if adapter is healthy"""
         pass
+
+class AdapterRuntime(AdapterInterface):
+    """Shared runtime logic for all adapters"""
+    
+    def __init__(self, model_name: str, api_key: str = None, config: Dict[str, Any] = None):
+        self.model_name = model_name
+        self.config = config or {}
+        self.request_count = 0
+        
+        # Secure credential handling
+        if api_key and api_key not in ["demo-key", "test-key"]:
+            if not isinstance(api_key, str) or len(api_key.strip()) == 0 or len(api_key.strip()) < 10:
+                raise ValueError(f"Invalid API key format for {model_name}")
+        self.api_key = api_key
+    
+    async def execute(self, umf_request: UMFRequest) -> UMFResponse:
+        """Execute with timing and error wrapping"""
+        self.request_count += 1
+        
+        try:
+            response = await self._execute_request(umf_request)
+            return response
+        except Exception as e:
+            # Wrap errors in standard format
+            return UMFResponse(
+                task_type=umf_request.task_type,
+                result=f"Error: {str(e)}",
+                request_id=umf_request.request_id,
+                cost_info={"error": True, "estimated_cost": 0.0}
+            )
+    
+    async def health_check(self) -> bool:
+        """Default health check - override in subclasses for actual validation"""
+        return True
+
+# Backward compatibility alias
+BaseAdapter = AdapterRuntime
 
 class ExecutionMode(Enum):
     SEQUENTIAL = "sequential"
     PARALLEL = "parallel"
 
 class Pipeline:
-    """AI workflow orchestration"""
+    """AI adapter workflow orchestration"""
     
     def __init__(self, name: str = None, config: Dict[str, Any] = None):
         self.name = name or f"pipeline_{uuid.uuid4().hex[:8]}"
@@ -93,7 +123,7 @@ class Pipeline:
         self.cost_tracking = {"total_cost": 0.0, "cost_by_step": {}}
     
     def register_adapter(self, adapter: BaseAdapter):
-        """Register an adapter for use in pipelines"""
+        """Register an AI adapter for pipeline execution"""
         capabilities = adapter.get_capabilities()
         for capability in capabilities:
             if capability not in self.adapters:
@@ -112,7 +142,7 @@ class Pipeline:
         return self
     
     async def execute(self, initial_payload: Any, execution_mode: ExecutionMode = ExecutionMode.SEQUENTIAL) -> Dict[str, UMFResponse]:
-        """Execute pipeline with authorization validation"""
+        """Execute adapter pipeline with validation"""
         # Validate pipeline configuration before execution
         self._validate_pipeline_security()
         
@@ -122,7 +152,7 @@ class Pipeline:
             return await self._execute_sequential(initial_payload)
     
     def _validate_pipeline_security(self):
-        """Validate pipeline configuration for security"""
+        """Validate adapter pipeline configuration"""
         if not self.steps:
             raise ValueError("Pipeline has no steps configured")
         
@@ -156,8 +186,7 @@ class Pipeline:
             request = UMFRequest(
                 task_type=step['task_type'],
                 payload=current_payload,
-                metadata=step['params'],
-                priority=step.get('priority', 0)
+                metadata=step['params']
             )
             
             response = await adapter.execute(request)
@@ -173,17 +202,17 @@ class Pipeline:
         return results
     
     def _select_adapter(self, task_type: str) -> BaseAdapter:
-        """Select best adapter for task type with server-side authorization"""
-        # Server-side validation - never trust client input
+        """Select optimal adapter for task type with validation"""
+        # Adapter validation - ensure task type compatibility
         if not isinstance(task_type, str) or not task_type.strip():
             raise ValueError(f"Invalid task type: {task_type}")
         
-        # Get registered adapters (server-controlled list)
+        # Get registered adapters for this task type
         adapters = self.adapters.get(task_type, [])
         if not adapters:
             raise ValueError(f"No adapter found for task type: {task_type}")
         
-        # Double-check adapter capabilities (server-side verification)
+        # Verify adapter capabilities match task requirements
         authorized_adapters = []
         for adapter in adapters:
             try:
@@ -197,7 +226,7 @@ class Pipeline:
         if not authorized_adapters:
             raise ValueError(f"No authorized adapter found for task type: {task_type}")
         
-        # Server-controlled load balancing
+        # Simple load balancing across available adapters
         return min(authorized_adapters, key=lambda a: a.request_count)
     
     async def _execute_parallel(self, initial_payload: Any) -> Dict[str, UMFResponse]:
@@ -246,7 +275,7 @@ class Pipeline:
                 task_type=request.task_type,
                 result=f"Error in step '{step_name}': {str(e)}",
                 request_id=request.request_id,
-                metadata={"error": True, "error_message": str(e)}
+                cost_info={"error": True, "error_message": str(e)}
             )
             return step_name, error_response
     

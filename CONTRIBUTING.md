@@ -1,6 +1,6 @@
 # Contributing to OpenBerl
 
-Welcome to the universal AI protocol. We're building the infrastructure layer that every AI application will use.
+Welcome to the universal AI adapter framework. We're building the infrastructure layer that every AI application will use.
 
 ## Quick Start
 
@@ -76,4 +76,4 @@ Open an issue or start a discussion. The community is here to help.
 
 ---
 
-*Every adapter makes OpenBerl more valuable. You're building the universal standard.*
+*Every adapter makes OpenBerl more valuable. You're building the universal adapter standard.*

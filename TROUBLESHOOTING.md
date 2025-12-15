@@ -1,6 +1,6 @@
 # OpenBerl Troubleshooting Guide
 
-Common issues and solutions when using the Universal AI Protocol.
+Common issues and solutions when using the AI Adapter Framework.
 
 ## 🚀 Quick Fixes
 
@@ -306,4 +306,4 @@ result = await pipeline.execute("Hello")
 
 ---
 
-*The OpenBerl community is here to help. Don't hesitate to ask questions!*
+*The OpenBerl adapter community is here to help. Don't hesitate to ask questions!*

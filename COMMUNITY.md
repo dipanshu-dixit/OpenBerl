@@ -7,7 +7,7 @@ Welcome to the OpenBerl community. We're developers, researchers, and companies 
 
 **Hall of Fame - Founding Contributors:**
 
-*Your name could be here. Be among the first to shape the universal AI protocol.*
+*Your name could be here. Be among the first to shape the universal AI adapter framework.*
 
 **Recent Contributors:**
 - *Waiting for our first community contribution...*
@@ -117,6 +117,6 @@ Welcome to the OpenBerl community. We're developers, researchers, and companies 
 
 ---
 
-**Every great open source project starts with a passionate community. Join us in building the universal standard for AI.**
+**Every great open source project starts with a passionate community. Join us in building the universal adapter standard for AI.**
 
-*The future of AI is collaborative. Let's build it together.*
+*The future of AI adapters is collaborative. Let's build it together.*
