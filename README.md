@@ -1,10 +1,5 @@
 # OpenBerl
-## The Universal AI Protocol
-
-**The missing layer that makes AI models work together seamlessly**
-
-🌐 **UNIVERSAL** 
-
+AI-communication Protocol
 OpenBerl solves the fundamental problem every developer faces: AI models don't talk to each other. What should take minutes currently takes months of custom integration work. We've built the universal translation layer that every AI application needs.
 
 **From solo developers to global corporations - one protocol, infinite possibilities.**
@@ -240,25 +235,7 @@ Just as HTTP connected the world's computers, OpenBerl connects the world's AI m
 
 ## Pricing
 
-**Built for everyone, from students to global corporations**
-
-**Free Tier**
-- 10,000 requests/month
-- All core features
-- Community support
-- Perfect for learning and prototyping
-
-**Professional** - $0.001/request
-- Unlimited requests
-- Priority support
-- Advanced analytics
-- Production SLA
-
-**Custom Solutions**
-- On-premises deployment
-- Custom integrations
-- Dedicated support
-- Volume pricing
+**Free for everyone, from students to global corporations**
 
 **Open Source Forever**
 The core protocol is MIT licensed. Build on it, extend it, make it yours.
